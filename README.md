@@ -16,6 +16,7 @@ Meshcore.NET provides a high-level, type-safe API for interacting with Meshcore 
 - ✅ **Path management** - Manage routing paths through the mesh network
 - ✅ **Time synchronization** - Sync device time with system time
 - ✅ **BLE Support** - Connect to devices via Bluetooth Low Energy
+- ✅ **PowerShell integration** - Complete PowerShell script examples for automation
 - ✅ **.NET 9.0** - Built on the latest .NET platform
 
 ## 📦 Installation
@@ -956,6 +957,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Based on the Meshcore mesh networking protocol
 - Inspired by the JavaScript meshcore wrapper implementation
 - Built with ❤️ for the mesh networking community
+
+## 📘 Additional Documentation
+
+- **[POWERSHELL_EXAMPLES.md](POWERSHELL_EXAMPLES.md)** - PowerShell script samples for all use cases
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Detailed architecture and integration guide
+- **[API_REFERENCE.md](API_REFERENCE.md)** - Quick API reference
 
 ## 📞 Support
 
