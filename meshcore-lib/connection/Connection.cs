@@ -3,46 +3,162 @@ using meshcore_lib.utils;
 
 namespace meshcore_lib.connection;
 
+/// <summary>
+/// Abstract base class for Meshcore device connections.
+/// Provides the core functionality for communicating with Meshcore mesh network devices
+/// through an event-driven architecture.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Implement this class to create connections for specific transport layers (BLE, Serial, etc.).
+/// You must implement the <see cref="Close"/> and <see cref="SendToRadioFrame"/> methods.
+/// </para>
+/// <para>
+/// The class follows an event-driven pattern:
+/// - Send commands using sendCommand* methods
+/// - Receive responses by subscribing to event handlers
+/// - Handle push notifications asynchronously
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// public class BleConnection : Connection
+/// {
+///     protected override void Close()
+///     {
+///         // Close your BLE connection
+///     }
+///     
+///     protected override void SendToRadioFrame(byte[] data)
+///     {
+///         // Write data to BLE characteristic
+///     }
+/// }
+/// </code>
+/// </example>
 public abstract class Connection {
+    /// <summary>
+    /// Closes the connection to the device. Implement this to clean up your transport resources.
+    /// </summary>
     protected abstract void Close();
+    
+    /// <summary>
+    /// Sends a data frame to the Meshcore device.
+    /// Implement this to write data to your specific transport layer (BLE, Serial, etc.).
+    /// </summary>
+    /// <param name="data">The binary data frame to send to the device</param>
     protected abstract void SendToRadioFrame(byte[] data);
+    
     private readonly Lock _rwLock = new();
 
+    // Push Events (Asynchronous notifications from device)
+    
+    /// <summary>Raised when the connection to the device is established</summary>
     public event EventHandler Connected;
+    
+    /// <summary>Raised when a raw frame is received from the device</summary>
     public event EventHandler<byte[]> FrameReceived;
+    
+    /// <summary>Raised when an advertisement is received from another node (auto-add mode)</summary>
     public event EventHandler<byte[]> AdvertPush;
+    
+    /// <summary>Raised when a contact's path has been updated</summary>
     public event EventHandler<byte[]> PathUpdatedPush;
+    
+    /// <summary>Raised when a sent message has been confirmed</summary>
     public event EventHandler<SendConfirmedPushPayload> SendConfirmedPush;
+    
+    /// <summary>Raised when there are messages waiting to be retrieved</summary>
     public event EventHandler MsgWaitingPush;
+    
+    /// <summary>Raised when raw data is received from the mesh network</summary>
     public event EventHandler<RawDataPushPayload> RawDataPush;
+    
+    /// <summary>Raised when login to a repeater or room is successful</summary>
     public event EventHandler<LoginSuccessPushPayload> LoginSuccessPush;
+    
+    /// <summary>Raised when a status response is received from a repeater</summary>
     public event EventHandler<StatusResponsePushPayload> StatusResponsePush;
+    
+    /// <summary>Raised when logged RX data is available</summary>
     public event EventHandler<LogRxDataPushPayload> LogRxDataPush;
+    
+    /// <summary>Raised when telemetry response is received from a node</summary>
     public event EventHandler<TelemetryResponsePushPayload> TelemetryResponsePush;
+    
+    /// <summary>Raised when trace data is received for a path trace operation</summary>
     public event EventHandler<TraceDataPushPayload> TraceDataPush;
+    
+    /// <summary>Raised when a new advertisement is received (manual-add mode)</summary>
     public event EventHandler<NewAdvertPushPayload> NewAdvertPush;
+    
+    // Response Events (Responses to commands)
+    
+    /// <summary>Raised when a command completes successfully</summary>
     public event EventHandler OkResponse;
+    
+    /// <summary>Raised when a command fails</summary>
     public event EventHandler ErrResponse;
+    
+    /// <summary>Raised when contact synchronization starts, provides total count</summary>
     public event EventHandler<uint> ContactsStartResponse;
+    
+    /// <summary>Raised for each contact during synchronization</summary>
     public event EventHandler<ContactPayload> ContactResponse;
+    
+    /// <summary>Raised when contact synchronization completes</summary>
     public event EventHandler<uint> EndOfContactsResponse;
+    
+    /// <summary>Raised when a message has been queued for transmission</summary>
     public event EventHandler<SentPayload> SentResponse;
-    //sender
+    
+    /// <summary>Raised when contact export data is available (raw advertisement packet)</summary>
     public event EventHandler<byte[]> ExportContactResponse;
-    //mV
+    
+    /// <summary>Raised when battery voltage response is received (in millivolts)</summary>
     public event EventHandler<ushort> BatteryVoltageResponse;
+    
+    /// <summary>Raised when device information is received</summary>
     public event EventHandler<DeviceInfoPayload> DeviceInfoResponse;
-    //privateKey
+    
+    /// <summary>Raised when private key export data is available (64 bytes)</summary>
     public event EventHandler<byte[]> PrivateKeyResponse;
+    
+    /// <summary>Raised when a feature is disabled on the device</summary>
     public event EventHandler DisabledResponse;
+    
+    /// <summary>Raised when channel information is received</summary>
     public event EventHandler<ChannelInfoPayload> ChannelInfoResponse;
+    
+    /// <summary>Raised when device self-information is received</summary>
     public event EventHandler<SelfInfoPayload> SelfInfoResponse;
+    
+    /// <summary>Raised when current device time is received (Unix epoch seconds)</summary>
     public event EventHandler<uint> CurrentTimeResponse;
+    
+    /// <summary>Raised when there are no more messages to sync</summary>
     public event EventHandler NoMoreMessagesResponse;
+    
+    /// <summary>Raised when a contact message is received</summary>
     public event EventHandler<ContactMsgPayload> ContactMsgRecv;
+    
+    /// <summary>Raised when a channel message is received</summary>
     public event EventHandler<ChannelMsgPayload> ChannelMsgRecv;
 
 
+    /// <summary>
+    /// Call this method when the connection to the device is established.
+    /// This will send the protocol version to the device and raise the Connected event.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// // In your BLE connection implementation:
+    /// protected override void OnBleConnected()
+    /// {
+    ///     connection.onConnected();
+    /// }
+    /// </code>
+    /// </example>
     public void onConnected() {
         // tell device what protocol version we support
         try {
@@ -56,6 +172,13 @@ public abstract class Connection {
         Connected.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>
+    /// Sends the AppStart command to initialize the app connection with the device.
+    /// </summary>
+    /// <remarks>
+    /// This is typically one of the first commands sent after connection.
+    /// It identifies the app and version to the device.
+    /// </remarks>
     public void sendCommandAppStart() {
         using MemoryStream ms = new();
         using BufferWriter data = new(ms);
@@ -66,6 +189,30 @@ public abstract class Connection {
         SendToRadioFrame(ms.ToArray());
     }
 
+    /// <summary>
+    /// Sends a text message to a contact through the mesh network.
+    /// </summary>
+    /// <param name="txtType">The type of text message (Plain, CliData, or SignedPlain)</param>
+    /// <param name="attempt">Retry attempt number (usually 0 for first attempt)</param>
+    /// <param name="senderTimestamp">Unix timestamp when the message was created</param>
+    /// <param name="pubKeyPrefix">Public key of the recipient contact (only first 6 bytes used)</param>
+    /// <param name="text">The message text to send</param>
+    /// <remarks>
+    /// Subscribe to <see cref="SentResponse"/> to get confirmation that the message was queued.
+    /// Subscribe to <see cref="SendConfirmedPush"/> to know when delivery is confirmed.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var timestamp = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    /// connection.sendCommandSendTxtMsg(
+    ///     Constants.TxtType.Plain,
+    ///     0,
+    ///     timestamp,
+    ///     contact.PublicKey,
+    ///     "Hello!"
+    /// );
+    /// </code>
+    /// </example>
     public void sendCommandSendTxtMsg(Constants.TxtType txtType,
         byte attempt,
         uint senderTimestamp,
