@@ -5,6 +5,25 @@
         <RootNamespace>meshcore_lib</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <!-- NuGet Package Metadata -->
+        <PackageId>Meshcore.NET</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Helmuts Reinis</Authors>
+        <Company>Meshcore.NET</Company>
+        <Product>Meshcore.NET</Product>
+        <Description>A comprehensive C# wrapper library for the Meshcore mesh networking protocol, enabling developers to build applications that communicate with Meshcore-compatible devices over Bluetooth Low Energy (BLE) or serial connections.</Description>
+        <PackageTags>meshcore;mesh;networking;ble;bluetooth;lora;meshtastic;iot</PackageTags>
+        <PackageProjectUrl>https://github.com/helmutsreinis/meshcore.net</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/helmutsreinis/meshcore.net</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
 
 </Project>
