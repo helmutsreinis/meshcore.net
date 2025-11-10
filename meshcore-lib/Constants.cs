@@ -2,20 +2,51 @@
 
 namespace meshcore_lib;
 
+/// <summary>
+/// Contains all protocol constants, enumerations, and helper methods for the Meshcore protocol.
+/// This class provides the foundation for communicating with Meshcore mesh network devices.
+/// </summary>
 public class Constants {
+    /// <summary>
+    /// The protocol version supported by this companion library.
+    /// Used to ensure compatibility between the app and device firmware.
+    /// </summary>
     public const int SupportedCompanionProtocolVersion = 1;
 
+    /// <summary>
+    /// Serial frame type markers used for framing data in serial communication.
+    /// </summary>
     public enum SerialFrameTypes {
+        /// <summary>Incoming frame marker ('>'), indicates data from device to app</summary>
         Incoming = 0x3e, // ">"
+        /// <summary>Outgoing frame marker ('<'), indicates data from app to device</summary>
         Outgoing = 0x3c, // "<"
     }
 
+    /// <summary>
+    /// Bluetooth Low Energy (BLE) service and characteristic identifiers.
+    /// </summary>
     public enum Ble {
+        /// <summary>Main BLE service UUID for Meshcore devices</summary>
         ServiceUuid = 1,
+        /// <summary>Characteristic UUID for receiving data from the app (RX from device perspective)</summary>
         CharacteristicUuidRx,
+        /// <summary>Characteristic UUID for transmitting data to the app (TX from device perspective)</summary>
         CharacteristicUuidTx,
     }
 
+    /// <summary>
+    /// Converts a BLE enum value to its corresponding UUID string.
+    /// </summary>
+    /// <param name="ble">The BLE identifier to convert</param>
+    /// <returns>The UUID string in standard format (e.g., "6E400001-B5A3-F393-E0A9-E50E24DCCA9E")</returns>
+    /// <exception cref="UnreachableException">Thrown if an invalid BLE value is provided</exception>
+    /// <example>
+    /// <code>
+    /// string serviceUuid = Constants.BleToUuid(Constants.Ble.ServiceUuid);
+    /// // Returns: "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
+    /// </code>
+    /// </example>
     public static string BleToUuid(Ble ble) {
         return ble switch {
             Ble.ServiceUuid => "6E400001-B5A3-F393-E0A9-E50E24DCCA9E",
@@ -25,6 +56,12 @@ public class Constants {
         };
     }
 
+    /// <summary>
+    /// Converts a UUID string back to its corresponding BLE enum value.
+    /// </summary>
+    /// <param name="uuid">The UUID string to convert</param>
+    /// <returns>The corresponding BLE enum value</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the UUID is not recognized</exception>
     public static Ble UuidToBle(string uuid) {
         return uuid switch {
             "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" => Ble.ServiceUuid,
@@ -34,6 +71,10 @@ public class Constants {
         };
     }
 
+    /// <summary>
+    /// Command codes that can be sent to the Meshcore device.
+    /// Each command triggers a specific action on the device.
+    /// </summary>
     public enum CommandCodes {
         AppStart,
         SendTxtMsg,
