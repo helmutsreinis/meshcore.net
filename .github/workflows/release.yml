@@ -32,11 +32,6 @@ jobs:
       - name: Build (Release)
         run: dotnet build --configuration Release --no-restore
 
-      - name: Pack NuGet package
-        run: |
-          dotnet pack meshcore-lib/meshcore-lib.csproj \
-            --configuration Release --no-build --output ./artifacts
-
       - name: Extract version from tag
         id: get_version
         run: |
