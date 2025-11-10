@@ -2,6 +2,8 @@
 
 A comprehensive C# wrapper library for the Meshcore mesh networking protocol, enabling developers to build applications that communicate with Meshcore-compatible devices over Bluetooth Low Energy (BLE) or serial connections.
 
+[![Create Release](https://github.com/helmutsreinis/meshcore.net/actions/workflows/release.yml/badge.svg)](https://github.com/helmutsreinis/meshcore.net/actions/workflows/release.yml)
+
 ## 🌟 Overview
 
 Meshcore.NET provides a high-level, type-safe API for interacting with Meshcore devices, which are part of a decentralized mesh network for off-grid communication. This library handles the low-level protocol details, allowing you to focus on building your application logic.
